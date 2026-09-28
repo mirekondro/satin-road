@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SatinRoad.Api/SatinRoad.Api.csproj" />
+  <Project Path="SatinRoad.Core/SatinRoad.Core.csproj" />
+  <Project Path="SatinRoad.Tests/SatinRoad.Tests.csproj" />
+</Solution>
