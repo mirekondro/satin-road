@@ -2,6 +2,8 @@ using LinqToDB;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using LinqToDB.Async;
+using SatinRoad.Api.Errors;
+using SatinRoad.Core.Categories;
 using SatinRoad.Core.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +18,15 @@ builder.Services.AddLinqToDBContext<AppDataConnection>((provider, options) =>
         .UseDefaultLogging(provider));
 
 // Services
-// builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<CategoryService>();
+
+// Errors: Core exceptions → 400/404/409
+builder.Services.AddExceptionHandler<DomainExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
