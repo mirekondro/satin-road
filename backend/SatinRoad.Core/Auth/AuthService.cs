@@ -7,19 +7,39 @@ public class AuthService(IUserRepository users, IPasswordHasher hasher)
 {
     public const int MinPasswordLength = 6;
 
-    // TODO (TDD green): make AuthServiceTests pass
-    // 1. username = username?.Trim(); empty → ValidationException
-    // 2. password null or shorter than MinPasswordLength → ValidationException
-    // 3. await users.GetByUsernameAsync(username) is not null → ConflictException
-    // 4. return await users.AddAsync(new User { Username = ..., PasswordHash = hasher.Hash(password) });
-    public Task<User> RegisterAsync(string? username, string? password) =>
-        throw new NotImplementedException();
+    public async Task<User> RegisterAsync(string? username, string? password)
+    {
+        var cleanUsername = username?.Trim() ?? "";
 
-    // TODO (TDD green):
-    // 1. user = await users.GetByUsernameAsync(username?.Trim() ?? "")
-    // 2. user is null OR !hasher.Verify(password, user.PasswordHash) → UnauthorizedException("Invalid username or password.")
-    // 3. user.IsShutDown → ForbiddenException("This account was shut down by the FBI.")
-    // 4. return user;
-    public Task<User> LoginAsync(string? username, string? password) =>
-        throw new NotImplementedException();
+        if (cleanUsername.Length == 0)
+            throw new ValidationException("Username is required.");
+
+        if (password is null || password.Length < MinPasswordLength)
+            throw new ValidationException(
+                $"Password must be at least {MinPasswordLength} characters long.");
+
+        if (await users.GetByUsernameAsync(cleanUsername) is not null)
+            throw new ConflictException($"Username '{cleanUsername}' is already taken.");
+
+        var user = new User
+        {
+            Username = cleanUsername,
+            PasswordHash = hasher.Hash(password),
+        };
+
+        return await users.AddAsync(user);
+    }
+
+    public async Task<User> LoginAsync(string? username, string? password)
+    {
+        var user = await users.GetByUsernameAsync(username?.Trim() ?? "");
+
+        if (user is null || password is null || !hasher.Verify(password, user.PasswordHash))
+            throw new UnauthorizedException("Invalid username or password.");
+
+        if (user.IsShutDown)
+            throw new ForbiddenException("This account was shut down by the FBI.");
+
+        return user;
+    }
 }
