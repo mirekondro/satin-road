@@ -14,6 +14,8 @@ public class DomainExceptionHandler : IExceptionHandler
             ValidationException => StatusCodes.Status400BadRequest,
             NotFoundException   => StatusCodes.Status404NotFound,
             ConflictException   => StatusCodes.Status409Conflict,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
+            ForbiddenException    => StatusCodes.Status403Forbidden,
             _ => 0
         };
 
