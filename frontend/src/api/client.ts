@@ -3,6 +3,8 @@ import { getStoredToken } from '../auth/authStorage.ts'
 
 
 export const api = new Api({
+
+    baseUrl: '',
     
     baseApiParams: { secure: true },
     
