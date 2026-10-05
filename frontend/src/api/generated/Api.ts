@@ -20,6 +20,37 @@ export interface CategoryRequest {
   name: string;
 }
 
+export interface ListingRequest {
+  /** @format int32 */
+  categoryId: number;
+  title: string;
+  description: null | string;
+  /** @format double */
+  price: number;
+  /** @format int32 */
+  stock: number;
+}
+
+export interface ListingView {
+  /** @format int32 */
+  id: number;
+  /** @format int32 */
+  vendorId: number;
+  vendorName: string;
+  /** @format int32 */
+  categoryId: number;
+  categoryName: string;
+  title: string;
+  description: null | string;
+  /** @format double */
+  price: number;
+  /** @format int32 */
+  stock: number;
+  isActive: boolean;
+  /** @format date-time */
+  createdAt: string;
+}
+
 export interface ProblemDetails {
   type?: null | string;
   title?: null | string;
@@ -27,6 +58,11 @@ export interface ProblemDetails {
   status?: null | number;
   detail?: null | string;
   instance?: null | string;
+}
+
+export interface StockRequest {
+  /** @format int32 */
+  stock: number;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -373,6 +409,132 @@ export class Api<
       this.request<void, ProblemDetails>({
         path: `/api/categories/${id}`,
         method: "DELETE",
+        ...params,
+      }),
+  };
+  listings = {
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsList
+     * @request GET:/api/listings
+     */
+    listingsList: (
+      query?: {
+        /** @format int32 */
+        categoryId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListingView[], any>({
+        path: `/api/listings`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsCreate
+     * @request POST:/api/listings
+     */
+    listingsCreate: (data: ListingRequest, params: RequestParams = {}) =>
+      this.request<ListingView, ProblemDetails>({
+        path: `/api/listings`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsDetail
+     * @request GET:/api/listings/{id}
+     */
+    listingsDetail: (id: number, params: RequestParams = {}) =>
+      this.request<ListingView, ProblemDetails>({
+        path: `/api/listings/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsUpdate
+     * @request PUT:/api/listings/{id}
+     */
+    listingsUpdate: (
+      id: number,
+      data: ListingRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<ListingView, ProblemDetails>({
+        path: `/api/listings/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsDelete
+     * @request DELETE:/api/listings/{id}
+     */
+    listingsDelete: (id: number, params: RequestParams = {}) =>
+      this.request<void, ProblemDetails>({
+        path: `/api/listings/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsMineList
+     * @request GET:/api/listings/mine
+     */
+    listingsMineList: (params: RequestParams = {}) =>
+      this.request<ListingView[], any>({
+        path: `/api/listings/mine`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listings
+     * @name ListingsStockPartialUpdate
+     * @request PATCH:/api/listings/{id}/stock
+     */
+    listingsStockPartialUpdate: (
+      id: number,
+      data: StockRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<ListingView, ProblemDetails>({
+        path: `/api/listings/${id}/stock`,
+        method: "PATCH",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

@@ -6,6 +6,7 @@ using SatinRoad.Api.Errors;
 using SatinRoad.Core.Categories;
 using SatinRoad.Core.Data;
 using System.Text.Json.Serialization;
+using SatinRoad.Core.Listings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddControllers()
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<IListingRepository, ListingRepository>();
+builder.Services.AddScoped<ListingService>();
 
 // Database
 builder.Services.AddLinqToDBContext<AppDataConnection>((provider, options) =>
