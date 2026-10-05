@@ -5,10 +5,14 @@ using LinqToDB.Async;
 using SatinRoad.Api.Errors;
 using SatinRoad.Core.Categories;
 using SatinRoad.Core.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict);
+builder.Services.ConfigureHttpJsonOptions(o =>
+    o.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
 builder.Services.AddOpenApi();
 
 // Database
