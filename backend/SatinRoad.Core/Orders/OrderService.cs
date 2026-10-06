@@ -3,7 +3,7 @@ using SatinRoad.Core.Entities;
 
 namespace SatinRoad.Core.Orders;
 
-public class OrderService(IOrderRepository repo)
+public class OrderService(IOrderRepository repo, IChanceProvider chance, FbiSettings fbi)
 {
     public const int MaxQuantity = 100;
 
@@ -55,6 +55,7 @@ public class OrderService(IOrderRepository repo)
             Total = CalculateTotal(listing.Price, quantity, discount),
         });
 
+        // TODO #12: roll chance.Roll(fbi.Chance); when true → await repo.ShutDownVendorAsync(listing.VendorId)
         return new PlaceOrderResult(order, VendorShutDown: false);
     }
 

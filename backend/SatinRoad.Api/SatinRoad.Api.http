@@ -92,3 +92,8 @@ Authorization: Bearer {{buyerToken}}
 ### My sales (vendor)
 GET {{api}}/api/orders/sales
 Authorization: Bearer {{userToken}}
+
+### FBI demo: start the API with   Fbi__Chance=1 dotnet run --project SatinRoad.Api
+### then the next order returns "vendorShutDown": true, the vendor can't log in (403)
+### and all their listings disappear from GET /api/listings
+GET {{api}}/api/listings
