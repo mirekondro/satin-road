@@ -33,6 +33,14 @@ public class FakeOrderRepository : IOrderRepository
         return Task.FromResult(order);
     }
 
+    public Task ShutDownVendorAsync(int vendorId)
+    {
+        Users.First(u => u.Id == vendorId).IsShutDown = true;
+        foreach (var listing in Listings.Where(l => l.VendorId == vendorId))
+            listing.IsActive = false;
+        return Task.CompletedTask;
+    }
+
     public Task<List<OrderView>> GetByBuyerAsync(int buyerId) =>
         Task.FromResult(Orders.Where(o => o.BuyerId == buyerId).Select(ToView).ToList());
 

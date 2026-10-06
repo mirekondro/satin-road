@@ -14,7 +14,7 @@ public class OrderServiceTests
 
     public OrderServiceTests()
     {
-        _service = new OrderService(_repo);
+        _service = new OrderService(_repo, new FakeChanceProvider(false), new FbiSettings());
         _buyer = _repo.SeedUser("buyer");
         _vendor = _repo.SeedUser("vendor");
     }

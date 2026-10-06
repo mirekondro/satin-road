@@ -14,6 +14,9 @@ public interface IOrderRepository
     /// Throws ConflictException when the stock is no longer sufficient.</summary>
     Task<Order> PlaceAsync(Order order);
 
+    /// <summary>Hard story #12: marks the vendor as shut down and deactivates all their listings (one transaction).</summary>
+    Task ShutDownVendorAsync(int vendorId);
+
     Task<List<OrderView>> GetByBuyerAsync(int buyerId);
     Task<List<OrderView>> GetByVendorAsync(int vendorId);
 }

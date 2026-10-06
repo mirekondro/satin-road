@@ -36,6 +36,23 @@ public class OrderRepository(AppDataConnection db) : IOrderRepository
         return order;
     }
 
+    public async Task ShutDownVendorAsync(int vendorId)
+    {
+        await using var tx = await db.BeginTransactionAsync();
+
+        await db.Users
+            .Where(u => u.Id == vendorId)
+            .Set(u => u.IsShutDown, true)
+            .UpdateAsync();
+
+        await db.Listings
+            .Where(l => l.VendorId == vendorId)
+            .Set(l => l.IsActive, false)
+            .UpdateAsync();
+
+        await tx.CommitAsync();
+    }
+
     public async Task<List<OrderView>> GetByBuyerAsync(int buyerId)
     {
         var result = await ToViews(db.Orders.Where(o => o.BuyerId == buyerId)).ToListAsync();

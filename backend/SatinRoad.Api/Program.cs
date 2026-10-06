@@ -48,6 +48,8 @@ builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddSingleton<IChanceProvider, RandomChanceProvider>();
+builder.Services.AddSingleton(new FbiSettings(builder.Configuration.GetValue("Fbi:Chance", 0.01)));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<AuthService>();

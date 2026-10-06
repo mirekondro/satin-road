@@ -14,7 +14,7 @@ public class DiscountTests
 
     public DiscountTests()
     {
-        _service = new OrderService(_repo);
+        _service = new OrderService(_repo, new FakeChanceProvider(false), new FbiSettings());
         _buyer = _repo.SeedUser("buyer");
         _vendor = _repo.SeedUser("vendor");
     }
