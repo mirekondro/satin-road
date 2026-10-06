@@ -20,36 +20,58 @@ public class OrderService(IOrderRepository repo)
 
     // ---------- Placing an order ----------
 
-    public Task<PlaceOrderResult> PlaceOrderAsync(int buyerId, int listingId, int quantity)
+    public async Task<PlaceOrderResult> PlaceOrderAsync(int buyerId, int listingId, int quantity)
     {
-        // TODO #10 (make OrderServiceTests green):
-        // 1. quantity < 1 or > MaxQuantity                      → ValidationException
-        // 2. listing = await repo.GetListingAsync(listingId)
-        //    null or !IsActive                                  → NotFoundException
-        // 3. listing.VendorId == buyerId                        → ValidationException ("You cannot buy your own listing.")
-        // 4. vendor = await repo.GetUserAsync(listing.VendorId)
-        //    null or IsShutDown                                 → NotFoundException
-        // 5. listing.Stock < quantity                           → ConflictException ("Not enough stock.")
-        //
-        // TODO #11 (make DiscountTests green):
-        // 6. previous = await repo.CountOrdersAsync(buyerId, listing.VendorId)
-        //    discount = QualifiesForDiscount(previous)
-        // 7. total = CalculateTotal(listing.Price, quantity, discount)
-        //
-        // 8. var order = new Order { BuyerId, VendorId, ListingId, Quantity, UnitPrice = listing.Price,
-        //                            DiscountApplied = discount, Total = total };
-        //    order = await repo.PlaceAsync(order);
-        //    return new PlaceOrderResult(order, VendorShutDown: false);
-        throw new NotImplementedException();
+        if (quantity < 1 || quantity > MaxQuantity)
+            throw new ValidationException($"Quantity must be between 1 and {MaxQuantity}.");
+
+        var listing = await repo.GetListingAsync(listingId);
+        if (listing is null || !listing.IsActive)
+            throw new NotFoundException($"Listing {listingId} not found.");
+
+        if (listing.VendorId == buyerId)
+            throw new ValidationException("You cannot buy your own listing.");
+
+        // A vendor shut down by the FBI is gone – their listings behave as if they don't exist
+        var vendor = await repo.GetUserAsync(listing.VendorId);
+        if (vendor is null || vendor.IsShutDown)
+            throw new NotFoundException($"Listing {listingId} not found.");
+
+        if (listing.Stock < quantity)
+            throw new ConflictException($"Not enough stock. Only {listing.Stock} left.");
+
+        // Hard story #11 – loyalty discount at this vendor
+        var previousOrders = await repo.CountOrdersAsync(buyerId, listing.VendorId);
+        var discount = QualifiesForDiscount(previousOrders);
+
+        var order = await repo.PlaceAsync(new Order
+        {
+            BuyerId = buyerId,
+            VendorId = listing.VendorId,
+            ListingId = listing.Id,
+            Quantity = quantity,
+            UnitPrice = listing.Price,
+            DiscountApplied = discount,
+            Total = CalculateTotal(listing.Price, quantity, discount),
+        });
+
+        return new PlaceOrderResult(order, VendorShutDown: false);
     }
 
     // ---------- Hard story #11: 20% discount ----------
 
     /// <summary>True when the buyer already has MORE than DiscountAfterOrders orders at this vendor.</summary>
     public static bool QualifiesForDiscount(int previousOrdersAtVendor) =>
-        throw new NotImplementedException(); // TODO #11: one line
+        previousOrdersAtVendor > DiscountAfterOrders;
 
     /// <summary>unitPrice * quantity, minus DiscountRate when discounted, rounded to 2 decimals.</summary>
-    public static decimal CalculateTotal(decimal unitPrice, int quantity, bool discount) =>
-        throw new NotImplementedException(); // TODO #11: use decimal.Round(..., 2)
+    public static decimal CalculateTotal(decimal unitPrice, int quantity, bool discount)
+    {
+        var total = unitPrice * quantity;
+
+        if (discount)
+            total *= 1 - DiscountRate;
+
+        return decimal.Round(total, 2);
+    }
 }
