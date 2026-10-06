@@ -2,6 +2,6 @@ namespace SatinRoad.Core.Orders;
 
 public class RandomChanceProvider : IChanceProvider
 {
-    // TODO #12: return true with the given probability (use Random.Shared.NextDouble())
-    public bool Roll(double probability) => throw new NotImplementedException();
+    // NextDouble() returns 0.0 – 0.99999…, so probability 0 is never true and 1 is always true
+    public bool Roll(double probability) => Random.Shared.NextDouble() < probability;
 }

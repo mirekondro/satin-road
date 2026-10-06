@@ -55,8 +55,13 @@ public class OrderService(IOrderRepository repo, IChanceProvider chance, FbiSett
             Total = CalculateTotal(listing.Price, quantity, discount),
         });
 
-        // TODO #12: roll chance.Roll(fbi.Chance); when true → await repo.ShutDownVendorAsync(listing.VendorId)
-        return new PlaceOrderResult(order, VendorShutDown: false);
+        // Hard story #12 – the buyer might be FBI. The purchase still happens (evidence!),
+        // but the vendor is shut down permanently and all their products disappear.
+        var fbiRaid = chance.Roll(fbi.Chance);
+        if (fbiRaid)
+            await repo.ShutDownVendorAsync(listing.VendorId);
+
+        return new PlaceOrderResult(order, VendorShutDown: fbiRaid);
     }
 
     // ---------- Hard story #11: 20% discount ----------
