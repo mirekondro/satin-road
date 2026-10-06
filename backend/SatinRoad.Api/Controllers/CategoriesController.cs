@@ -2,6 +2,7 @@
 using SatinRoad.Api.Contracts;
 using SatinRoad.Core.Categories;
 using SatinRoad.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SatinRoad.Api.Controllers;
 
@@ -9,6 +10,7 @@ namespace SatinRoad.Api.Controllers;
 [Route("api/categories")]
 public class CategoriesController(CategoryService service) : ControllerBase
 {
+    
     [HttpGet]
     [ProducesResponseType<List<CategoryDto>>(StatusCodes.Status200OK)]
     public async Task<List<CategoryDto>> GetAll()
@@ -17,6 +19,7 @@ public class CategoriesController(CategoryService service) : ControllerBase
         return categories.Select(ToDto).ToList();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType<CategoryDto>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -27,6 +30,7 @@ public class CategoriesController(CategoryService service) : ControllerBase
         return Created($"/api/categories/{created.Id}", ToDto(created));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     [ProducesResponseType<CategoryDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -35,6 +39,7 @@ public class CategoriesController(CategoryService service) : ControllerBase
     public async Task<CategoryDto> Update(int id, CategoryRequest request) =>
         ToDto(await service.UpdateAsync(id, request.Name));
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
