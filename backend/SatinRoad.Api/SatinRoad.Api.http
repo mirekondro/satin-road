@@ -1,6 +1,47 @@
-@SatinRoad.Api_HostAddress = http://localhost:5273
+@api = http://localhost:5273
 
-GET {{SatinRoad.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Register user
+POST {{api}}/api/auth/register
+Content-Type: application/json
 
-###
+{ "username": "vendor1", "password": "secret123" }
+
+### Login as user
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "vendor1", "password": "secret123" }
+
+> {% client.global.set("userToken", response.body.token); %}
+
+### Login as admin
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "admin123" }
+
+> {% client.global.set("adminToken", response.body.token); %}
+
+### Me
+GET {{api}}/api/auth/me
+Authorization: Bearer {{userToken}}
+
+### Create category – no token (expect 401)
+POST {{api}}/api/categories
+Content-Type: application/json
+
+{ "name": "Poisons" }
+
+### Create category – normal user (expect 403)
+POST {{api}}/api/categories
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{ "name": "Poisons" }
+
+### Create category – admin (expect 201)
+POST {{api}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "name": "Poisons" }
