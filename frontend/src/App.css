@@ -370,6 +370,13 @@
 .input-sm { width: 90px; padding: 6px 10px; }
 .stock-editor { display: flex; align-items: center; }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* ===== Orders ===== */
 .alert-success {
   color: var(--success);
