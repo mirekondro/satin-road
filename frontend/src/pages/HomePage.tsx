@@ -1,6 +1,9 @@
 import { Link } from 'react-router'
+import { useFeaturedVendors } from '../api/useFeaturedVendors.ts'
 
 export default function HomePage() {
+  const { vendors, loading, error } = useFeaturedVendors()
+
   return (
     <>
       <section className="hero">
@@ -25,12 +28,32 @@ export default function HomePage() {
           <h2>Featured vendors</h2>
           <span className="badge">100+ sales</span>
         </div>
-        {/* TODO: connect to the featured vendors API */}
-        <div className="grid">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="card skeleton" aria-hidden />
-          ))}
-        </div>
+        {loading && (
+          <div className="grid">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="card skeleton" aria-hidden />
+            ))}
+          </div>
+        )}
+        {error && <p className="alert alert-error">{error}</p>}
+
+        {!loading && !error && (
+          vendors.length === 0 ? (
+            <div className="card empty-state">
+              No vendor has passed 100 sales yet. Be the first one.
+            </div>
+          ) : (
+            <div className="grid">
+              {vendors.map((v, index) => (
+                <article key={v.vendorId} className="card">
+                  <p className="eyebrow">#{index + 1} featured</p>
+                  <h3 className="item-title">{v.username}</h3>
+                  <p className="muted">{v.ordersSold} sales</p>
+                </article>
+              ))}
+            </div>
+          )
+        )}
       </section>
     </>
   )

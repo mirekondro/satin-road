@@ -10,6 +10,14 @@
  * ---------------------------------------------------------------
  */
 
+export interface AuthResponse {
+  token: string;
+  /** @format int32 */
+  userId: number;
+  username: string;
+  role: string;
+}
+
 export interface CategoryDto {
   /** @format int32 */
   id: number;
@@ -18,6 +26,14 @@ export interface CategoryDto {
 
 export interface CategoryRequest {
   name: string;
+}
+
+export interface FeaturedVendor {
+  /** @format int32 */
+  vendorId: number;
+  username: string;
+  /** @format int32 */
+  ordersSold: number;
 }
 
 export interface ListingRequest {
@@ -51,6 +67,63 @@ export interface ListingView {
   createdAt: string;
 }
 
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface MeResponse {
+  /** @format int32 */
+  id: number;
+  username: string;
+  role: string;
+}
+
+export interface OrderRequest {
+  /** @format int32 */
+  listingId: number;
+  /** @format int32 */
+  quantity: number;
+}
+
+export interface OrderView {
+  /** @format int32 */
+  id: number;
+  /** @format int32 */
+  listingId: number;
+  listingTitle: string;
+  /** @format int32 */
+  buyerId: number;
+  buyerName: string;
+  /** @format int32 */
+  vendorId: number;
+  vendorName: string;
+  /** @format int32 */
+  quantity: number;
+  /** @format double */
+  unitPrice: number;
+  discountApplied: boolean;
+  /** @format double */
+  total: number;
+  /** @format date-time */
+  createdAt: string;
+}
+
+export interface PlacedOrderResponse {
+  /** @format int32 */
+  id: number;
+  /** @format int32 */
+  listingId: number;
+  /** @format int32 */
+  quantity: number;
+  /** @format double */
+  unitPrice: number;
+  discountApplied: boolean;
+  /** @format double */
+  total: number;
+  vendorShutDown: boolean;
+}
+
 export interface ProblemDetails {
   type?: null | string;
   title?: null | string;
@@ -58,6 +131,11 @@ export interface ProblemDetails {
   status?: null | number;
   detail?: null | string;
   instance?: null | string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  password: string;
 }
 
 export interface StockRequest {
@@ -344,6 +422,56 @@ export class Api<
         ...params,
       }),
   };
+  auth = {
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthRegisterCreate
+     * @request POST:/api/auth/register
+     */
+    authRegisterCreate: (data: RegisterRequest, params: RequestParams = {}) =>
+      this.request<AuthResponse, ProblemDetails>({
+        path: `/api/auth/register`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthLoginCreate
+     * @request POST:/api/auth/login
+     */
+    authLoginCreate: (data: LoginRequest, params: RequestParams = {}) =>
+      this.request<AuthResponse, ProblemDetails>({
+        path: `/api/auth/login`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthMeList
+     * @request GET:/api/auth/me
+     */
+    authMeList: (params: RequestParams = {}) =>
+      this.request<MeResponse, ProblemDetails>({
+        path: `/api/auth/me`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
   categories = {
     /**
      * No description
@@ -534,6 +662,70 @@ export class Api<
         method: "PATCH",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  orders = {
+    /**
+     * No description
+     *
+     * @tags Orders
+     * @name OrdersCreate
+     * @request POST:/api/orders
+     */
+    ordersCreate: (data: OrderRequest, params: RequestParams = {}) =>
+      this.request<PlacedOrderResponse, ProblemDetails>({
+        path: `/api/orders`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Orders
+     * @name OrdersMineList
+     * @request GET:/api/orders/mine
+     */
+    ordersMineList: (params: RequestParams = {}) =>
+      this.request<OrderView[], any>({
+        path: `/api/orders/mine`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Orders
+     * @name OrdersSalesList
+     * @request GET:/api/orders/sales
+     */
+    ordersSalesList: (params: RequestParams = {}) =>
+      this.request<OrderView[], any>({
+        path: `/api/orders/sales`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  vendors = {
+    /**
+     * No description
+     *
+     * @tags Vendors
+     * @name VendorsFeaturedList
+     * @request GET:/api/vendors/featured
+     */
+    vendorsFeaturedList: (params: RequestParams = {}) =>
+      this.request<FeaturedVendor[], any>({
+        path: `/api/vendors/featured`,
+        method: "GET",
         format: "json",
         ...params,
       }),
