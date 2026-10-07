@@ -1,5 +1,5 @@
 services:
-  db: 
+  db:
     image: postgres:17
     environment:
       POSTGRES_USER: satin
@@ -8,3 +8,29 @@ services:
     ports: ["5432:5432"]
     volumes:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U satin -d satinroad"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=satinroad;Username=satin;Password=satin"
+      Jwt__Issuer: SatinRoad
+      Jwt__Audience: SatinRoad
+      Jwt__Key: "cze-28-02-06-cze-satin-cze-28-02-06-cze-satin"
+      Admin__Password: admin123
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:80"]
+    depends_on: [api]
+
+volumes:
+  pgdata:
