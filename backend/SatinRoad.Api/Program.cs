@@ -14,6 +14,7 @@ using SatinRoad.Core.Data;
 using SatinRoad.Core.Entities;
 using SatinRoad.Core.Listings;
 using SatinRoad.Core.Orders;
+using SatinRoad.Core.Vendors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,8 @@ builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<VendorService>();
 builder.Services.AddSingleton<IChanceProvider, RandomChanceProvider>();
 builder.Services.AddSingleton(new FbiSettings(builder.Configuration.GetValue("Fbi:Chance", 0.01)));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
