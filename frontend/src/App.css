@@ -352,3 +352,20 @@
   padding-top: 20px;
   border-top: 1px solid var(--border);
 }
+
+/* ===== My shop ===== */
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.page-head .page-title { margin: 0; }
+.form-wide { max-width: 640px; margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions { display: flex; gap: 8px; }
+.item-meta { margin: 2px 0 0; font-size: 0.9rem; }
+.item-row-inactive { opacity: 0.55; }
+.input-sm { width: 90px; padding: 6px 10px; }
+.stock-editor { display: flex; align-items: center; }
