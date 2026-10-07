@@ -97,3 +97,6 @@ Authorization: Bearer {{userToken}}
 ### then the next order returns "vendorShutDown": true, the vendor can't log in (403)
 ### and all their listings disappear from GET /api/listings
 GET {{api}}/api/listings
+
+### ---------- Featured vendors (more than 100 sales) ----------
+GET {{api}}/api/vendors/featured
