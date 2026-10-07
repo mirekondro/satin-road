@@ -6,12 +6,19 @@ public class VendorService(IVendorRepository repo)
     // on the top of the listings / landing page."
     public const int FeaturedAfterOrders = 100;
 
-    /// <summary>TODO #13: true when the vendor sold MORE than FeaturedAfterOrders orders.</summary>
-    public static bool IsFeatured(int ordersSold) => throw new NotImplementedException();
+    /// <summary>True when the vendor sold MORE than FeaturedAfterOrders orders.</summary>
+    public static bool IsFeatured(int ordersSold) => ordersSold > FeaturedAfterOrders;
 
-    /// <summary>
-    /// TODO #13: vendors that are featured and not shut down by the FBI,
-    /// best sellers first (then by username).
-    /// </summary>
-    public Task<List<FeaturedVendor>> GetFeaturedAsync() => throw new NotImplementedException();
+    /// <summary>Featured vendors that were not shut down by the FBI, best sellers first.</summary>
+    public async Task<List<FeaturedVendor>> GetFeaturedAsync()
+    {
+        var stats = await repo.GetVendorStatsAsync();
+
+        return stats
+            .Where(v => !v.IsShutDown && IsFeatured(v.OrdersSold))
+            .OrderByDescending(v => v.OrdersSold)
+            .ThenBy(v => v.Username)
+            .Select(v => new FeaturedVendor(v.VendorId, v.Username, v.OrdersSold))
+            .ToList();
+    }
 }
