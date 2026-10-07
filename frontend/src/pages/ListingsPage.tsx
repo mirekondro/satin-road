@@ -1,42 +1,55 @@
-import { useCallback } from 'react'
-import { useSearchParams } from 'react-router'
+import { useCallback, useState } from 'react'
+import { Link, useParams } from 'react-router'
 import { api } from '../api/client.ts'
 import { useFetch } from '../api/useFetch.ts'
-import CategoryFilter from '../components/categories/CategoryFilter.tsx'
-import ListingCard from '../components/listings/ListingCard.tsx'
+import StockBadge from '../components/listings/StockBadge.tsx'
+import BuyBox from '../components/orders/BuyBox.tsx'
+import { formatPrice } from '../utils/format.ts'
 
-export default function ListingsPage() {
-    const [searchParams] = useSearchParams()
-    const categoryParam = searchParams.get('category')
-    const categoryId = categoryParam ? Number(categoryParam) : undefined
+export default function ListingDetailPage() {
+    const id = Number(useParams().id)
 
-    const fetchListings = useCallback(
-        () => api.listings.listingsList({ categoryId }),
-        [categoryId],
-    )
-    const { data: listings, loading, error } = useFetch(fetchListings)
+    const fetchListing = useCallback(() => api.listings.listingsDetail(id), [id])
+    const { data: listing, loading, error } = useFetch(fetchListing)
+
+    // How many pieces were bought on this page → stock updates without reloading
+    const [bought, setBought] = useState(0)
+
+    if (loading) return <section className="container page"><p className="muted">Loading…</p></section>
+
+    if (error || !listing) {
+        return (
+            <section className="container page">
+                <p className="alert alert-error">{error ?? 'Listing not found.'}</p>
+                <Link to="/listings" className="btn btn-ghost">← Back to listings</Link>
+            </section>
+        )
+    }
+
+    const stock = listing.stock - bought
 
     return (
         <section className="container page">
-            <h1 className="page-title">Listings</h1>
-            <CategoryFilter />
+            <Link to="/listings" className="back-link">← Back to listings</Link>
 
-            {loading && (
-                <div className="grid">
-                    {[1, 2, 3].map((i) => <div key={i} className="card skeleton" aria-hidden />)}
+            <div className="listing-detail card">
+                <div className="listing-card-top">
+                    <Link to={`/listings?category=${listing.categoryId}`} className="badge">
+                        {listing.categoryName}
+                    </Link>
+                    <StockBadge stock={stock} />
                 </div>
-            )}
-            {error && <p className="alert alert-error">{error}</p>}
 
-            {!loading && listings && (
-                listings.length === 0 ? (
-                    <div className="card empty-state">Nothing here yet. The goods are hiding.</div>
-                ) : (
-                    <div className="grid">
-                        {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
-                    </div>
-                )
-            )}
+                <h1 className="listing-detail-title">{listing.title}</h1>
+                <p className="muted">Sold by @{listing.vendorName}</p>
+
+                {listing.description && <p className="listing-description">{listing.description}</p>}
+
+                <div className="listing-buy">
+                    <span className="listing-price listing-price-lg">{formatPrice(listing.price)}</span>
+                    <BuyBox listing={listing} stock={stock} onBought={(q) => setBought((b) => b + q)} />
+                </div>
+            </div>
         </section>
     )
 }
