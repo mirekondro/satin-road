@@ -1,5 +1,5 @@
-import Placeholder from '../components/Placeholder.tsx'
+import AuthForm from '../components/auth/AuthForm.tsx'
 
 export default function RegisterPage() {
-  return <Placeholder title="Sign up">Registration form.</Placeholder>
+  return <AuthForm mode="register" />
 }

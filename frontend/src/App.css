@@ -391,3 +391,8 @@
   .buy-box { align-items: stretch; }
   .order-amount { justify-content: space-between; }
 }
+/* ===== Auth (login / register) ===== */
+.auth-page { display: flex; justify-content: center; }
+.auth-form { width: 100%; max-width: 420px; }
+.auth-form .page-title { margin-bottom: 0; }
+.auth-switch { margin: 0; text-align: center; font-size: 0.9rem; }
