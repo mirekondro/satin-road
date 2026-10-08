@@ -10,7 +10,7 @@ export default function ListingCard({ listing }: { listing: ListingView }) {
                 <span className="badge">{listing.categoryName}</span>
                 <StockBadge stock={listing.stock} />
             </div>
-            <h3 className="listing-card-title">{listing.title}</h3>
+            <h2 className="listing-card-title">{listing.title}</h2>
             <p className="muted listing-card-vendor">by @{listing.vendorName}</p>
             <p className="listing-price">{formatPrice(listing.price)}</p>
         </Link>
