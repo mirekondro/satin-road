@@ -324,7 +324,7 @@
   gap: 8px;
   margin-bottom: 8px;
 }
-.listing-card-title { margin: 0; }
+.listing-card-title { margin: 0; font-size: 1.1rem; } /* h2 for correct heading order, h3 size */
 .listing-card-vendor { margin: 0; font-size: 0.9rem; }
 .listing-price {
   margin: auto 0 0;

@@ -228,14 +228,27 @@ The suite has over 100 test cases and runs in about two seconds.
 
 ## Sustainability (Lighthouse)
 
-<!-- TODO: add the Lighthouse scores and screenshots (before / after) -->
+Measured with Chrome DevTools Lighthouse, mobile, page `/listings`.
+Full reports: [`docs/lighthouse/`](docs/lighthouse/).
 
 | Category | Before | After |
-|---|---|---|
-| Performance | – | – |
-| Accessibility | – | – |
-| Best Practices | – | – |
-| SEO | – | – |
+|---|--------|-------|
+| Performance | 94     | 99    |
+| Accessibility | 95     | 100   |
+| Best Practices | 100    | 100   |
+| SEO | 82     | 100   |
+
+| Metric | Before | After |
+|---|--------|-------|
+| First Contentful Paint | 1.8 s  | 1.4 s |
+| Largest Contentful Paint | 2.8 s  | 1.7 s |
+| Total Blocking Time | 100 ms | 0 ms  |
+| Speed Index | 1.8 s  | 1.4 s |
+| Total page weight | 180 KiB | 106 KiB (−41 %) |
+
+| Before | After |
+|---|---|
+| ![Lighthouse before](docs/lighthouse/before.png) | ![Lighthouse after](docs/lighthouse/after.png) |
 
 The audit is run against the **production build** (`docker compose up --build`, http://localhost:3000), not the Vite dev server.
 

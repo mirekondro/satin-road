@@ -6,7 +6,7 @@
   --border: #2b2735;
   --text: #b8b3c4;
   --text-h: #f2eff7;
-  --muted: #7d7789;
+  --muted: #908a9c;          /* min. 4.5:1 contrast on cards (WCAG AA) */
 
   --accent: #c9a36a;          /* satin gold */
   --accent-hover: #dbb987;
