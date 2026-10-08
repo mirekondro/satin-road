@@ -7,7 +7,8 @@ services:
       POSTGRES_DB: satinroad
     ports: ["5432:5432"]
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U satin -d satinroad"]
@@ -23,6 +24,8 @@ services:
       Jwt__Audience: SatinRoad
       Jwt__Key: "cze-28-02-06-cze-satin-cze-28-02-06-cze-satin"
       Admin__Password: admin123
+      # FBI raid probability – for the demo:  FBI_CHANCE=1 docker compose up
+      Fbi__Chance: ${FBI_CHANCE:-0.01}
     depends_on:
       db:
         condition: service_healthy
