@@ -1,5 +1,5 @@
-import Placeholder from '../components/Placeholder.tsx'
+import AuthForm from '../components/auth/AuthForm.tsx'
 
 export default function LoginPage() {
-  return <Placeholder title="Log in">Login form.</Placeholder>
+  return <AuthForm mode="login" />
 }

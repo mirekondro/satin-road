@@ -1,8 +1,9 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { api } from '../api/client.ts'
 import { useFetch } from '../api/useFetch.ts'
 import StockBadge from '../components/listings/StockBadge.tsx'
+import BuyBox from '../components/orders/BuyBox.tsx'
 import { formatPrice } from '../utils/format.ts'
 
 export default function ListingDetailPage() {
@@ -10,6 +11,10 @@ export default function ListingDetailPage() {
 
   const fetchListing = useCallback(() => api.listings.listingsDetail(id), [id])
   const { data: listing, loading, error } = useFetch(fetchListing)
+  // How many pieces were bought on this page → stock shown without reloading the listing.
+  // Remembered together with the id, so it resets when you open another listing.
+  const [bought, setBought] = useState({ id, count: 0 })
+  const boughtHere = bought.id === id ? bought.count : 0
 
   if (loading) return <section className="container page"><p className="muted">Loading…</p></section>
 
@@ -22,6 +27,8 @@ export default function ListingDetailPage() {
     )
   }
 
+  const stock = Math.max(0, listing.stock - boughtHere)
+
   return (
       <section className="container page">
         <Link to="/listings" className="back-link">← Back to listings</Link>
@@ -31,7 +38,7 @@ export default function ListingDetailPage() {
             <Link to={`/listings?category=${listing.categoryId}`} className="badge">
               {listing.categoryName}
             </Link>
-            <StockBadge stock={listing.stock} />
+            <StockBadge stock={stock} />
           </div>
 
           <h1 className="listing-detail-title">{listing.title}</h1>
@@ -41,10 +48,7 @@ export default function ListingDetailPage() {
 
           <div className="listing-buy">
             <span className="listing-price listing-price-lg">{formatPrice(listing.price)}</span>
-            {/* Purchase button */}
-            <button className="btn btn-primary" disabled={listing.stock === 0}>
-              {listing.stock === 0 ? 'Sold out' : 'Buy'}
-            </button>
+            <BuyBox listing={listing} stock={stock} onBought={(q) => setBought({ id, count: boughtHere + q })} />
           </div>
         </div>
       </section>
