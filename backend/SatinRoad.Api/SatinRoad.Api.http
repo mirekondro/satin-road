@@ -1,6 +1,102 @@
-@SatinRoad.Api_HostAddress = http://localhost:5273
+@api = http://localhost:5273
 
-GET {{SatinRoad.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Register user
+POST {{api}}/api/auth/register
+Content-Type: application/json
 
-###
+{ "username": "vendor1", "password": "secret123" }
+
+### Login as user
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "vendor1", "password": "secret123" }
+
+> {% client.global.set("userToken", response.body.token); %}
+
+### Login as admin
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "admin123" }
+
+> {% client.global.set("adminToken", response.body.token); %}
+
+### Me
+GET {{api}}/api/auth/me
+Authorization: Bearer {{userToken}}
+
+### Create category – no token (expect 401)
+POST {{api}}/api/categories
+Content-Type: application/json
+
+{ "name": "Poisons" }
+
+### Create category – normal user (expect 403)
+POST {{api}}/api/categories
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{ "name": "Poisons" }
+
+### Create category – admin (expect 201)
+POST {{api}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "name": "Poisons" }
+
+### ---------- Orders ----------
+
+### Vendor (vendor1) creates a listing
+POST {{api}}/api/listings
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{ "categoryId": 1, "title": "Fake Rolex", "description": "Ticks almost like a real one", "price": 10.00, "stock": 50 }
+
+> {% client.global.set("listingId", response.body.id); %}
+
+### Register buyer
+POST {{api}}/api/auth/register
+Content-Type: application/json
+
+{ "username": "buyer1", "password": "secret123" }
+
+### Login buyer
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "buyer1", "password": "secret123" }
+
+> {% client.global.set("buyerToken", response.body.token); %}
+
+### Buyer places an order (run 12x → from the 12th order on: discountApplied = true, total 8.00)
+POST {{api}}/api/orders
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{ "listingId": {{listingId}}, "quantity": 1 }
+
+### Buying own listing (expect 400)
+POST {{api}}/api/orders
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{ "listingId": {{listingId}}, "quantity": 1 }
+
+### My orders (buyer)
+GET {{api}}/api/orders/mine
+Authorization: Bearer {{buyerToken}}
+
+### My sales (vendor)
+GET {{api}}/api/orders/sales
+Authorization: Bearer {{userToken}}
+
+### FBI demo: start the API with   Fbi__Chance=1 dotnet run --project SatinRoad.Api
+### then the next order returns "vendorShutDown": true, the vendor can't log in (403)
+### and all their listings disappear from GET /api/listings
+GET {{api}}/api/listings
+
+### ---------- Featured vendors (more than 100 sales) ----------
+GET {{api}}/api/vendors/featured
